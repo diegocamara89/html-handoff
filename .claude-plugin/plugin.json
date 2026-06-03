@@ -1,0 +1,8 @@
+{
+  "name": "html-handoff",
+  "description": "Auto-activated skill: emits self-contained HTML artifacts instead of walls of markdown when the output is a long document a human will read and navigate.",
+  "version": "0.1.0",
+  "author": { "name": "Diego Câmara" },
+  "license": "MIT",
+  "keywords": ["skills", "html", "documentation", "visualization", "mermaid", "handoff"]
+}

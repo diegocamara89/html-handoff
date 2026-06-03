@@ -1,0 +1,4 @@
+# temporários de teste
+tests/*.out
+*.tmp
+.DS_Store
