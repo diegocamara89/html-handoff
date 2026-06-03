@@ -13,9 +13,11 @@ Plugin Claude Code que **auto-ativa** uma skill para emitir **artefatos HTML aut
 ## Quando NÃO faz
 Chat curto, README, mensagem de commit, descrição de PR, ou saída consumida por pipeline/outro agente. Detalhes em `skills/html-handoff/references/rubrica-decisao.md`.
 
-## Instalação (marketplace local)
+## Instalação
+Clone o repositório e adicione como marketplace local:
 ```
-/plugin marketplace add C:\Users\marce\Diego\html-handoff
+git clone https://github.com/diegocamara89/html-handoff
+/plugin marketplace add ./html-handoff
 /plugin install html-handoff@html-handoff-dev
 ```
 Reinicie a sessão (ou `/clear`); o nudge de `SessionStart` passa a aparecer.
