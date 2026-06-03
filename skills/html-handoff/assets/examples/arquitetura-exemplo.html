@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plataforma Aurora — exploração interativa (exemplo html-handoff)</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --line:#e2e8f0; --txt:#0f172a; --muted:#64748b;
+    --accent:#1f6feb; --accent2:#3b82f6;
+    --foundation:#0e7490; --transversal:#7c3aed; --domain:#b45309;
+    --ok:#15803d; --bad:#b91c1c; --warn:#a16207;
+    --shadow:0 1px 3px rgba(15,23,42,.08),0 8px 24px rgba(15,23,42,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1120; --card:#111a2e; --line:#1e293b; --txt:#e2e8f0; --muted:#94a3b8;
+      --accent:#60a5fa; --accent2:#3b82f6;
+      --foundation:#22d3ee; --transversal:#a78bfa; --domain:#fbbf24;
+      --ok:#4ade80; --bad:#f87171; --warn:#facc15;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--txt);background:var(--bg);-webkit-font-smoothing:antialiased}
+  header.top{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:26px 30px}
+  header.top h1{margin:0 0 6px;font-size:23px;letter-spacing:-.02em}
+  header.top p{margin:0;opacity:.92;font-size:13.5px;max-width:760px}
+  .badges{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .badge{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);
+    padding:4px 11px;border-radius:999px;font-size:12px}
+  .badge code{color:#fff;background:rgba(0,0,0,.18);padding:1px 5px;border-radius:4px}
+  nav.tabs{display:flex;gap:2px;background:var(--card);border-bottom:1px solid var(--line);
+    padding:0 18px;position:sticky;top:0;z-index:20;flex-wrap:wrap;box-shadow:var(--shadow)}
+  nav.tabs button{border:0;background:none;padding:14px 16px;font-size:14px;cursor:pointer;
+    color:var(--muted);border-bottom:3px solid transparent;transition:.15s}
+  nav.tabs button:hover{color:var(--txt)}
+  nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+  main{max-width:1100px;margin:0 auto;padding:26px 20px 80px}
+  section.tab{display:none}
+  section.tab.active{display:block;animation:fade .22s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  h2.sec{font-size:18px;margin:6px 0 14px;color:var(--accent);letter-spacing:-.01em}
+  h2.sec.mt{margin-top:30px}
+  p.lead{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  .grid-num{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+  .num{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+  .num b{display:block;font-size:28px;color:var(--accent);letter-spacing:-.02em}
+  .num span{font-size:12.5px;color:var(--muted)}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+  .box code,.note code,td code,li code{background:color-mix(in srgb,var(--accent) 14%,transparent);
+    padding:1px 5px;border-radius:4px;font-size:12.5px;font-family:ui-monospace,"Cascadia Code",Consolas,monospace}
+  .layer{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:14px;
+    overflow:hidden;box-shadow:var(--shadow)}
+  .layer>.lh{padding:11px 15px;font-weight:600;color:#fff;display:flex;justify-content:space-between;align-items:center}
+  .lh small{font-weight:400;opacity:.9;font-size:12px}
+  .lh.f{background:var(--foundation)}.lh.t{background:var(--transversal)}.lh.d{background:var(--domain)}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;padding:15px}
+  .chip{border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:9px;
+    padding:9px 12px;cursor:pointer;background:var(--card);min-width:150px;transition:.13s}
+  .chip:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+  .chip.f{border-left-color:var(--foundation)}.chip.t{border-left-color:var(--transversal)}.chip.d{border-left-color:var(--domain)}
+  .chip.dim{opacity:.22;filter:grayscale(.4)}
+  .chip b{font-size:13.5px}.chip span{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+  .chip .tag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;color:#fff;float:right}
+  .tag.f{background:var(--foundation)}.tag.t{background:var(--transversal)}.tag.d{background:var(--domain)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .legend span.lbl{font-size:12px;color:var(--muted)}
+  .legend button{border:1px solid var(--line);background:var(--card);border-radius:999px;
+    padding:5px 12px;cursor:pointer;font-size:12px;color:var(--txt);display:flex;align-items:center;gap:6px}
+  .legend button.active{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;font-size:13px;box-shadow:var(--shadow)}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:color-mix(in srgb,var(--accent) 8%,var(--card));color:var(--accent);font-size:12px}
+  tr:last-child td{border-bottom:0}
+  .phase{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--accent);
+    border-radius:10px;padding:13px 15px;margin-bottom:10px;box-shadow:var(--shadow)}
+  .phase h4{margin:0 0 5px;font-size:14.5px}
+  .phase .dep{font-size:11.5px;color:var(--muted)}
+  .phase ul{margin:7px 0 0;padding-left:18px;font-size:13px}
+  .phase.pilot{border-left-color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,var(--card))}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.ba{grid-template-columns:1fr}}
+  .ba .box.bad{border-top:4px solid var(--bad)}
+  .ba .box.good{border-top:4px solid var(--ok)}
+  .ba h4{margin:0 0 9px;font-size:14.5px}
+  .ba ul{margin:0;padding-left:18px;font-size:13px}
+  .note{font-size:12px;color:var(--muted);margin-top:8px}
+  /* Mermaid: fallback legível antes do render; limpo depois */
+  pre.mermaid{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:12px;
+    background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:14px;
+    color:var(--muted);overflow:auto;white-space:pre;box-shadow:var(--shadow)}
+  pre.mermaid[data-processed="true"]{background:var(--card);border:1px solid var(--line);
+    padding:16px;text-align:center;white-space:normal}
+  .panel{position:fixed;top:0;right:0;width:min(440px,92vw);height:100%;background:var(--card);
+    box-shadow:-6px 0 30px rgba(0,0,0,.28);transform:translateX(100%);transition:.24s;z-index:60;
+    padding:24px;overflow:auto}
+  .panel.open{transform:none}
+  .panel h3{margin:0 0 4px;color:var(--accent)}
+  .panel .close{position:absolute;top:15px;right:17px;border:0;background:none;font-size:24px;
+    cursor:pointer;color:var(--muted);line-height:1}
+  .panel dl{margin:16px 0 0}
+  .panel dt{font-size:11px;text-transform:uppercase;color:var(--muted);margin-top:13px;letter-spacing:.05em}
+  .panel dd{margin:3px 0 0}
+  .scrim{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:.24s;z-index:55}
+  .scrim.open{opacity:1;pointer-events:auto}
+  footer{max-width:1100px;margin:0 auto;padding:0 20px 50px;color:var(--muted);font-size:12px}
+  @media print{
+    nav.tabs{display:none}section.tab{display:block!important}.panel,.scrim{display:none}
+    header.top{background:none;color:#000;border-bottom:2px solid #000}body{background:#fff}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Plataforma Aurora — exploração interativa</h1>
+  <p>Consolidação de 9 micro-ferramentas isoladas numa plataforma em camadas. Exemplo <b>fictício</b> gerado para demonstrar o padrão <code>html-handoff</code>: documento longo apresentado como fluxo visual navegável.</p>
+  <div class="badges">
+    <span class="badge">Autocontido · sem CDN de assets</span>
+    <span class="badge">Diagramas via <code>mermaid@11</code></span>
+    <span class="badge">Tema claro/escuro automático</span>
+    <span class="badge">Dados 100% fictícios</span>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="active" data-t="vis">Visão geral</button>
+  <button data-t="cam">Camadas</button>
+  <button data-t="mod">Módulos → destino</button>
+  <button data-t="bld">Plano de build</button>
+  <button data-t="flx">Fluxos</button>
+</nav>
+
+<main>
+  <!-- VISÃO GERAL -->
+  <section class="tab active" id="vis">
+    <h2 class="sec">O problema, em números</h2>
+    <div class="grid-num">
+      <div class="num"><b>9</b><span>micro-ferramentas re-implementando o mesmo</span></div>
+      <div class="num"><b>4→1</b><span>motores de storage → engine único</span></div>
+      <div class="num"><b>3→1</b><span>cópias de autenticação → serviço único</span></div>
+      <div class="num"><b>2→1</b><span>fontes de verdade do catálogo</span></div>
+    </div>
+
+    <h2 class="sec">A tese em uma frase</h2>
+    <div class="box">
+      Transformar ferramentas isoladas numa <b>plataforma em 3 camadas</b> — <b style="color:var(--foundation)">Fundação</b> (interna, compartilhada) · <b style="color:var(--transversal)">Transversais</b> (consumidas, não recodificadas) · <b style="color:var(--domain)">Domínios</b> (features finas) — com <b>engine de storage único</b> e <b>contratos de dados versionados</b>.
+      <p class="note">As três camadas <b>consomem para baixo</b> e nunca para os lados — é o que mantém o acoplamento sob controle. O diagrama abaixo mostra essa direção.</p>
+    </div>
+
+    <h2 class="sec mt">Direção de dependência entre camadas</h2>
+    <pre class="mermaid">
+flowchart TD
+  subgraph D["DOMÍNIOS (features)"]
+    Billing & Reports & Dashboard
+  end
+  subgraph T["TRANSVERSAIS (serviços compartilhados)"]
+    Search & Notify & Export
+  end
+  subgraph F["FUNDAÇÃO (interna)"]
+    Storage & Auth & Config & Telemetry
+  end
+  D --> T --> F
+  D -. "pode usar direto" .-> F
+    </pre>
+    <p class="note">Setas cheias = consumo normal (camada acima → camada abaixo). Tracejada = atalho permitido de domínio direto à fundação. Nenhuma seta horizontal: camadas não se acoplam entre pares.</p>
+  </section>
+
+  <!-- CAMADAS -->
+  <section class="tab" id="cam">
+    <h2 class="sec">Três camadas — clique num componente para ver o detalhe</h2>
+    <div class="legend">
+      <span class="lbl">Filtrar:</span>
+      <button data-f="all" class="active"><span class="dot" style="background:var(--muted)"></span>Todas</button>
+      <button data-f="f"><span class="dot" style="background:var(--foundation)"></span>Fundação</button>
+      <button data-f="t"><span class="dot" style="background:var(--transversal)"></span>Transversais</button>
+      <button data-f="d"><span class="dot" style="background:var(--domain)"></span>Domínios</button>
+    </div>
+    <div class="layer"><div class="lh f">FUNDAÇÃO <small>interna · base de todos</small></div><div class="chips" id="cF"></div></div>
+    <div class="layer"><div class="lh t">TRANSVERSAIS <small>selecionáveis · consomem a fundação</small></div><div class="chips" id="cT"></div></div>
+    <div class="layer"><div class="lh d">DOMÍNIOS <small>features · compõem fundação + transversais</small></div><div class="chips" id="cD"></div></div>
+  </section>
+
+  <!-- MÓDULOS -->
+  <section class="tab" id="mod">
+    <h2 class="sec">As 9 ferramentas → onde cada uma cai</h2>
+    <table id="tmod"><thead><tr><th>Ferramenta (hoje)</th><th>Destino</th><th>Camada</th><th>Maturidade</th></tr></thead><tbody></tbody></table>
+    <p class="note">Maturidade: <b>pronto</b> = só promover · <b>migrar</b> = ajustar contrato · <b>criar</b> = não existe ainda.</p>
+  </section>
+
+  <!-- BUILD -->
+  <section class="tab" id="bld">
+    <h2 class="sec">Ordem de build (Fase 0 bloqueia tudo)</h2>
+    <div id="phases"></div>
+
+    <h2 class="sec mt">Dependências entre fases</h2>
+    <pre class="mermaid">
+flowchart LR
+  F0["Fase 0<br/>Fundação"] --> F1["Fase 1<br/>Storage único"]
+  F0 --> F2["Fase 2<br/>Transversais"]
+  F1 --> F2
+  F2 --> F3["Fase 3<br/>Domínios"]
+  F3 --> F4["Fase 4<br/>Migração legado"]
+  classDef pilot fill:#fde68a,stroke:#a16207,color:#111;
+  class F2 pilot;
+    </pre>
+
+    <h2 class="sec mt">Cronograma estimado</h2>
+    <pre class="mermaid">
+gantt
+  dateFormat  YYYY-MM-DD
+  axisFormat  %b
+  section Fundação
+  Fase 0 (infra+contratos)      :f0, 2026-06-01, 30d
+  section Núcleo
+  Fase 1 (storage único)        :f1, after f0, 20d
+  Fase 2 (transversais) ★piloto :f2, after f1, 25d
+  section Features
+  Fase 3 (domínios)             :f3, after f2, 30d
+  Fase 4 (migração legado)      :f4, after f3, 20d
+    </pre>
+  </section>
+
+  <!-- FLUXOS -->
+  <section class="tab" id="flx">
+    <h2 class="sec">Pipeline de uma requisição</h2>
+    <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant C as Cliente
+  participant G as Gateway
+  participant S as Serviço de domínio
+  participant A as Auth (fundação)
+  participant St as Storage (fundação)
+  C->>G: requisição
+  G->>A: valida token
+  A-->>G: ok (claims)
+  G->>S: encaminha
+  S->>St: lê/grava
+  St-->>S: dados
+  S-->>C: resposta
+    </pre>
+
+    <h2 class="sec mt">Cascata de ingestão de dados</h2>
+    <pre class="mermaid">
+flowchart LR
+  In([entrada]) --> P{parse ok?}
+  P -- sim --> V{válido?}
+  P -- não --> Q[fila de erro]
+  V -- sim --> E[enriquecer] --> W[(gravar)]
+  V -- não --> Q
+  Q --> R[revisão manual]
+    </pre>
+
+    <h2 class="sec mt">Antes × depois</h2>
+    <div class="ba">
+      <div class="box bad">
+        <h4>❌ Hoje (monolito de cópias)</h4>
+        <ul>
+          <li>4 motores de <code>storage</code> paralelos</li>
+          <li>autenticação copiada em 3 lugares</li>
+          <li>contrato de dados implícito, sem versão</li>
+          <li>cada ferramenta re-implementa busca/export</li>
+        </ul>
+        <p class="note">Mudar uma regra exige tocar em N lugares → divergência silenciosa.</p>
+      </div>
+      <div class="box good">
+        <h4>✔ Alvo (em camadas)</h4>
+        <ul>
+          <li><code>storage</code> único na fundação</li>
+          <li><code>auth</code> como serviço consumido</li>
+          <li>contratos versionados (<code>schema</code> validado)</li>
+          <li>busca/export viram transversais reaproveitadas</li>
+        </ul>
+        <p class="note">Uma regra muda num lugar só; as camadas acima herdam.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Exemplo fictício · gerado como demonstração do padrão <b>html-handoff</b> (saída visual autocontida para documentos longos). Nenhum dado real.
+</footer>
+
+<div class="scrim" id="scrim" onclick="closePanel()"></div>
+<div class="panel" id="panel"><button class="close" onclick="closePanel()" aria-label="fechar">×</button><div id="pbody"></div></div>
+
+<!-- Mermaid via CDN pinado. Fallback: se não carregar, o <pre> mostra o source legível. -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>
+const DATA = {
+  f:[
+    {id:'Storage',c:'f',sub:'engine único',state:'migrar',d:'Funde os 4 motores paralelos num só. Camada-base: todo dado passa por aqui.'},
+    {id:'Auth',c:'f',sub:'serviço único',state:'migrar',d:'Autenticação/autorização. Hoje copiada em 3 ferramentas; vira serviço consumido.'},
+    {id:'Config',c:'f',sub:'config central',state:'pronto',d:'Configuração do tenant/operador. Já existe, só promover.'},
+    {id:'Telemetry',c:'f',sub:'logs + métricas',state:'pronto',d:'Observabilidade transversal a tudo. Base para os dashboards de domínio.'},
+  ],
+  t:[
+    {id:'Search',c:'t',sub:'busca reaproveitada',state:'migrar',d:'Índice de busca consumindo o Storage da fundação. Hoje cada ferramenta tinha o seu.'},
+    {id:'Notify',c:'t',sub:'notificações',state:'criar',d:'Serviço de notificação (e-mail/push). Não existe ainda — único transversal a criar.'},
+    {id:'Export',c:'t',sub:'exportação',state:'pronto',d:'Gera CSV/PDF a partir de qualquer domínio. Promover do protótipo atual.'},
+  ],
+  d:[
+    {id:'Billing',c:'d',sub:'cobrança',state:'',d:'Faturamento e planos. Consome Auth + Storage + Export.'},
+    {id:'Reports',c:'d',sub:'relatórios',state:'',d:'Relatórios analíticos. Consome Search + Telemetry + Export.'},
+    {id:'Dashboard',c:'d',sub:'painel',state:'',d:'Painel operacional em tempo real. Consome Telemetry.'},
+  ],
+  mods:[
+    ['legacy-store-a','Storage (fundação)','f','migrar'],
+    ['legacy-store-b','Storage (fundação)','f','migrar'],
+    ['auth-mini','Auth (fundação)','f','migrar'],
+    ['config-svc','Config (fundação)','f','pronto'],
+    ['quick-search','Search (transversal)','t','migrar'],
+    ['export-proto','Export (transversal)','t','pronto'],
+    ['billing-app','Billing (domínio)','d','—'],
+    ['report-tool','Reports (domínio)','d','—'],
+    ['ops-panel','Dashboard (domínio)','d','—'],
+  ],
+  phases:[
+    {t:'Fase 0 — Fundação',dep:'bloqueia tudo',pilot:false,items:['0a Storage engine + contratos versionados','0b Auth como serviço','0c Config + Telemetry']},
+    {t:'Fase 1 — Storage único',dep:'depende da Fase 0',pilot:false,items:['1a migrar leitores para o engine','1b aposentar os 4 motores legados']},
+    {t:'★ Fase 2 — Transversais (PILOTO)',dep:'depende das Fases 0-1',pilot:true,items:['Search + Export sobre a fundação','Criar Notify','Critério de saída: 1 domínio consome 1 transversal ponta a ponta']},
+    {t:'Fase 3 — Domínios',dep:'depende da Fase 2',pilot:false,items:['Billing, Reports, Dashboard sobre transversais']},
+    {t:'Fase 4 — Migração do legado',dep:'depende da Fase 3',pilot:false,items:['desligar as 9 ferramentas antigas','redirecionar tráfego']},
+  ]
+};
+const $=s=>document.querySelector(s);
+function chip(o){return `<div class="chip ${o.c}" data-c="${o.c}" tabindex="0" role="button"
+  onclick='openPanel(${JSON.stringify(o).replace(/'/g,"&#39;")})'>
+  <span class="tag ${o.c}">${o.id}</span><b>${o.id}</b><span>${o.sub}</span></div>`;}
+$('#cF').innerHTML=DATA.f.map(chip).join('');
+$('#cT').innerHTML=DATA.t.map(chip).join('');
+$('#cD').innerHTML=DATA.d.map(chip).join('');
+$('#tmod tbody').innerHTML=DATA.mods.map(r=>`<tr><td><code>${r[0]}</code></td><td>${r[1]}</td><td><span class="tag ${r[2]}">${r[2]==='f'?'fundação':r[2]==='t'?'transversal':'domínio'}</span></td><td>${r[3]}</td></tr>`).join('');
+$('#phases').innerHTML=DATA.phases.map(p=>`<div class="phase ${p.pilot?'pilot':''}"><h4>${p.t}</h4><div class="dep">${p.dep}</div><ul>${p.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`).join('');
+
+function openPanel(o){
+  const camada=o.c==='f'?'Fundação':o.c==='t'?'Transversal':'Domínio';
+  $('#pbody').innerHTML=`<h3>${o.id}</h3><span class="tag ${o.c}">${camada}</span> <span class="note">${o.state||''}</span>
+    <dl><dt>Resumo</dt><dd>${o.sub}</dd><dt>Detalhe</dt><dd>${o.d}</dd></dl>`;
+  $('#panel').classList.add('open');$('#scrim').classList.add('open');
+}
+function closePanel(){$('#panel').classList.remove('open');$('#scrim').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
+
+// --- Mermaid: render por aba (robusto p/ seções ocultas) ---
+const prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+let mermaidReady=false;
+if(window.mermaid){
+  mermaid.initialize({startOnLoad:false,theme:prefersDark?'dark':'default',flowchart:{curve:'basis'},securityLevel:'strict'});
+  mermaidReady=true;
+}
+function renderDiagrams(section){
+  if(!mermaidReady)return; // sem CDN → o <pre> já mostra o source (fallback legível)
+  const nodes=section.querySelectorAll('pre.mermaid:not([data-processed])');
+  if(nodes.length)mermaid.run({nodes});
+}
+function activate(name){
+  document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.t===name));
+  document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('active',s.id===name));
+  const sec=$('#'+name);if(sec)renderDiagrams(sec);
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>activate(b.dataset.t));
+document.querySelectorAll('.legend button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.legend button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');const f=b.dataset.f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('dim',f!=='all'&&c.dataset.c!==f));
+});
+// render a aba inicial
+renderDiagrams($('#vis'));
+</script>
+</body>
+</html>

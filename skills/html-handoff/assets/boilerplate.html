@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TÍTULO — exploração</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#fff; --line:#e2e8f0; --txt:#0f172a; --muted:#64748b;
+    --accent:#1f6feb; --accent2:#3b82f6; --ok:#15803d; --bad:#b91c1c; --warn:#a16207;
+    --shadow:0 1px 3px rgba(15,23,42,.08),0 8px 24px rgba(15,23,42,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0b1120; --card:#111a2e; --line:#1e293b; --txt:#e2e8f0; --muted:#94a3b8;
+      --accent:#60a5fa; --ok:#4ade80; --bad:#f87171; --warn:#facc15;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--txt);background:var(--bg)}
+  header.top{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:24px 28px}
+  header.top h1{margin:0 0 6px;font-size:22px}
+  header.top p{margin:0;opacity:.92;font-size:13.5px;max-width:760px}
+  nav.tabs{display:flex;gap:2px;background:var(--card);border-bottom:1px solid var(--line);padding:0 18px;position:sticky;top:0;z-index:20;flex-wrap:wrap;box-shadow:var(--shadow)}
+  nav.tabs button{border:0;background:none;padding:14px 16px;font-size:14px;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent}
+  nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+  main{max-width:1100px;margin:0 auto;padding:26px 20px 80px}
+  section.tab{display:none} section.tab.active{display:block;animation:fade .2s}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1}}
+  h2.sec{font-size:18px;margin:6px 0 14px;color:var(--accent)}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:14px}
+  pre.mermaid{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);overflow:auto;white-space:pre}
+  pre.mermaid[data-processed="true"]{border-style:solid;text-align:center;white-space:normal}
+  @media print{nav.tabs{display:none}section.tab{display:block!important}body{background:#fff}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>TÍTULO</h1>
+  <p>Subtítulo curto explicando o que é este documento.</p>
+</header>
+<nav class="tabs" id="tabs">
+  <button class="active" data-t="a">Seção A</button>
+  <button data-t="b">Seção B</button>
+</nav>
+<main>
+  <section class="tab active" id="a">
+    <h2 class="sec">Seção A</h2>
+    <div class="box">Conteúdo. Troque pelos blocos do cardápio.</div>
+    <pre class="mermaid">
+flowchart LR
+  X[início] --> Y{decisão} --> Z[fim]
+    </pre>
+  </section>
+  <section class="tab" id="b">
+    <h2 class="sec">Seção B</h2>
+    <div class="box">Outra seção.</div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const prefersDark=matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches;
+if(window.mermaid) mermaid.initialize({startOnLoad:false,theme:prefersDark?'dark':'default',securityLevel:'strict'});
+function renderDiagrams(sec){ if(!window.mermaid||!sec)return; const n=sec.querySelectorAll('pre.mermaid:not([data-processed])'); if(n.length)mermaid.run({nodes:n}); }
+function activate(name){
+  document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x.dataset.t===name));
+  document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('active',s.id===name));
+  renderDiagrams($('#'+name));
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>activate(b.dataset.t));
+renderDiagrams($('#a'));
+</script>
+</body>
+</html>
