@@ -1,3 +1,5 @@
-# Hook scripts MUST stay LF — Git Bash quebra com CRLF (\r)
+# session-start é bash — precisa de LF sempre (Git Bash quebra com \r)
 hooks/session-start text eol=lf
-hooks/run-hook.cmd text eol=lf
+# run-hook.cmd é polyglot: cmd.exe (Windows) exige CRLF; bash (Unix) exige LF.
+# text=auto entrega o EOL nativo de cada plataforma no checkout.
+hooks/run-hook.cmd text=auto

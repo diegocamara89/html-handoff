@@ -1,6 +1,6 @@
 ---
 name: html-handoff
-description: Emite um artefato HTML autocontido (em vez de uma parede de markdown) quando o output é um documento longo/complexo que um humano vai LER e NAVEGAR. Use ao produzir plano, spec, review de código, comparação de opções, relatório, dashboard, design system, explicação longa, ou quando o usuário disser "explica", "me mostra", "compara", "visualiza", "faz um HTML", "documenta isso". NÃO use para chat curto, README, mensagem de commit, descrição de PR, ou saída consumida por pipeline/outro agente.
+description: Gera um artefato HTML autocontido e navegável (em vez de uma parede de markdown) APENAS quando o output esperado for substancial e visual — tipicamente >80-100 linhas, com hierarquia, comparação, diagrama de fluxo, tabela densa ou painel. Use ao produzir plano de implementação, spec, review extenso de código, comparação multi-critério, relatório, dashboard, design system ou explicação longa; ou quando o usuário pedir explicitamente um HTML/visualização. NÃO use para resposta curta de chat, README, mensagem de commit, descrição de PR, ou saída consumida por pipeline/outro agente.
 ---
 
 # Skill html-handoff
@@ -34,7 +34,7 @@ Antes de produzir um artefato substancial, aplique `references/rubrica-decisao.m
 ## Saída
 
 - Salve um único `.html` na **pasta de trabalho atual** (nome derivado do tópico, ex.: `2026-06-02-<topico>.html`).
-- **Abra no navegador** após gerar:
+- **Abra no navegador** após gerar **quando a sessão for local/interativa** (em ambiente headless/remoto, apenas informe o caminho):
   - Windows: `Start-Process "<arquivo>.html"`
   - macOS: `open "<arquivo>.html"` · Linux: `xdg-open "<arquivo>.html"`
 - Avise o usuário com o caminho do arquivo e um resumo do que foi montado.
