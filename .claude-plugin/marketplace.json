@@ -1,0 +1,18 @@
+{
+  "name": "html-handoff-dev",
+  "description": "Development marketplace for the html-handoff plugin",
+  "owner": {
+    "name": "Diego Câmara"
+  },
+  "plugins": [
+    {
+      "name": "html-handoff",
+      "description": "Auto-activated skill: emits self-contained HTML artifacts instead of walls of markdown when the output is a long document a human will read and navigate.",
+      "version": "0.1.0",
+      "source": "./",
+      "author": {
+        "name": "Diego Câmara"
+      }
+    }
+  ]
+}
