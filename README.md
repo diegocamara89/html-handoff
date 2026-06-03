@@ -16,9 +16,9 @@ Chat curto, README, mensagem de commit, descrição de PR, ou saída consumida p
 ## Instalação (marketplace local)
 ```
 /plugin marketplace add C:\Users\marce\Diego\html-handoff
-/plugin install html-handoff
+/plugin install html-handoff@html-handoff-dev
 ```
-Reinicie a sessão; o nudge de `SessionStart` passa a aparecer.
+Reinicie a sessão (ou `/clear`); o nudge de `SessionStart` passa a aparecer.
 
 > Requisito Windows: Git for Windows (fornece `bash.exe`), usado pelo wrapper `hooks/run-hook.cmd`.
 
