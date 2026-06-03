@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# SessionStart hook for html-handoff plugin
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+nudge_content=$(cat "${SCRIPT_DIR}/nudge.md" 2>&1 || echo "Error reading nudge.md")
+
+# Escape para JSON usando só substituição de parâmetro bash (sem sed/awk).
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+nudge_escaped=$(escape_for_json "$nudge_content")
+session_context="<html-handoff>\nVocê tem a skill html-handoff. ${nudge_escaped}\n</html-handoff>"
+
+# Claude Code: hookSpecificOutput.additionalContext (aninhado).
+# Outras plataformas (Copilot/SDK): additionalContext (topo).
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+  printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"
+fi
+
+exit 0

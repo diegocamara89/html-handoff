@@ -1,0 +1,3 @@
+# Hook scripts MUST stay LF — Git Bash quebra com CRLF (\r)
+hooks/session-start text eol=lf
+hooks/run-hook.cmd text eol=lf
